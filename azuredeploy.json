@@ -37,7 +37,7 @@
     "variables": {
         "nicName": "[concat(parameters('vmName'), '-nic')]",
         "publicIpName": "[concat(parameters('vmName'), '-ip')]",
-        "subnetName": "dafault",
+        "subnetName": "default",
         "vnetId": "[resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName'))]",
         "subnetId": "[concat(variables('vnetId'), '/subnets/',  variables('subnetName'))]"
     },
@@ -79,7 +79,8 @@
             "location": "[resourceGroup().location]",
             "apiVersion": "2016-03-30",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/publicIpAddresses', variables('publicIpName'))]"
+                "[resourceId('Microsoft.Network/publicIpAddresses', variables('publicIpName'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName'))]"
             ],
             "properties": {
                 "ipConfigurations": [
