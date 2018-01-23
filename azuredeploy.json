@@ -39,7 +39,11 @@
         "publicIpName": "[concat(parameters('vmName'), '-ip')]",
         "subnetName": "default",
         "vnetId": "[resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName'))]",
-        "subnetId": "[concat(variables('vnetId'), '/subnets/',  variables('subnetName'))]"
+        "subnetId": "[concat(variables('vnetId'), '/subnets/',  variables('subnetName'))]",
+        "baseUri": "[deployment().properties.templateLink.uri]",
+        "webConfigureModuleURL": "[uri(variables('baseUri'), 'DSC/SetupWebServer.ps1.zip')]",
+        "webConfigureFunction": "SetupWebServer.ps1\\ConfigureWebDsc"
+
     },
     "resources": [
         {
@@ -133,6 +137,27 @@
                             "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]"
                         }
                     ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "name": "[concat(parameters('vmName'), '/configureweb')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines', parameters('vmName'))]"
+            ],
+            "apiVersion": "2016-03-30",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "publisher": "Microsoft.Powershell",
+                "type": "DSC",
+                "typeHandlerVersion": "2.21",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "modulesURL": "[variables('webConfigureModuleURL')]",
+                    "configurationFunction": "[variables('webConfigureFunction')]",
+                    "properties": {
+                    }
                 }
             }
         }        
